@@ -2,10 +2,10 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": "GridInventory",
+	"FriendlyName": "OBGridInventory",
 	"Description": "",
 	"Category": "Other",
-	"CreatedBy": "OaiBa",
+	"CreatedBy": "",
 	"CreatedByURL": "",
 	"DocsURL": "",
 	"MarketplaceURL": "",
@@ -13,10 +13,10 @@
 	"CanContainContent": true,
 	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
-	"Installed": false,
+	"Installed": true,
 	"Modules": [
 		{
-			"Name": "GridInventory",
+			"Name": "OBGridInventory",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}

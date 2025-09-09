@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class GridInventory : ModuleRules
+public class OBGridInventory : ModuleRules
 {
-	public GridInventory(ReadOnlyTargetRules Target) : base(Target)
+	public OBGridInventory(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		

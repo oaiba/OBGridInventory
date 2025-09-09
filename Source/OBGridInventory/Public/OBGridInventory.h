@@ -4,7 +4,7 @@
 
 #include "Modules/ModuleManager.h"
 
-class FGridInventoryModule : public IModuleInterface
+class FOBGridInventoryModule : public IModuleInterface
 {
 public:
 
