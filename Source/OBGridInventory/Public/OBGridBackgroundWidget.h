@@ -30,9 +30,12 @@ struct FOBGridInventoryConfig
 		meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float GridLineThickness = 1.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory Grid|Config")
+	FLinearColor BorderLineColor = FLinearColor(0.05f, 0.05f, 0.05f, 0.8f);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory Grid|Config",
 		meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float BorderLineThickness = 1.0f;
+	float BorderLineThickness = 2.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory Grid|Config",
 		meta = (DisplayName = "Show Name in Editor", Tooltip =
@@ -89,6 +92,9 @@ private:
 
 	UPROPERTY(Transient)
 	FLinearColor GridLineColor = FLinearColor(0.1f, 0.1f, 0.1f, 0.5f);
+
+	UPROPERTY(Transient)
+	FLinearColor BorderLineColor = FLinearColor(0.05f, 0.05f, 0.05f, 0.8f);
 
 	UPROPERTY(Transient)
 	float GridLineThickness = 1.0f;

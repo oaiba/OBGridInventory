@@ -12,6 +12,7 @@ void UOBGridBackgroundWidget::UpdateGridParameters(const FOBGridInventoryConfig 
 	CellSize = FMath::Max(1.0f, InGridConfig.CellSize);
 	GridLineColor = InGridConfig.GridLineColor;
 	GridLineThickness = FMath::Max(0.0f, InGridConfig.GridLineThickness);
+	BorderLineColor = InGridConfig.BorderLineColor;
 	BorderLineThickness = FMath::Max(0.0f, InGridConfig.BorderLineThickness);
 	bIsShowNameOnTopLeftCorner = InGridConfig.bIsShowNameOnTopLeftCorner;
 	// Trigger a repaint when configuration changes
@@ -40,15 +41,14 @@ int32 UOBGridBackgroundWidget::NativePaint(const FPaintArgs& Args, const FGeomet
 	const float ScaledMaxX = NumColumns * ScaledCellSize;
 	const float ScaledMaxY = NumRows * ScaledCellSize;
 
-	// Choose appropriate thickness for grid and borderlines
 	const float ScaledGridLineThickness = FMath::Max(1.0f, GridLineThickness * Scale);
 	const float ScaledBorderThickness = FMath::Max(1.0f, BorderLineThickness * Scale);
 
 	const FPaintGeometry PaintGeometry = AllottedGeometry.ToPaintGeometry();
 	const int32 CurrentLayerId = LayerId;
 
-	// Check if we have any lines to draw
-	if (GridLineColor.A <= 0)
+	// Check if we have any lines to draw at all (either grid or border)
+	if (GridLineColor.A <= 0 && BorderLineColor.A <= 0)
 	{
 		return CurrentLayerId;
 	}
@@ -63,11 +63,15 @@ int32 UOBGridBackgroundWidget::NativePaint(const FPaintArgs& Args, const FGeomet
 		LinePoints[0] = FVector2D(LineX, 0);
 		LinePoints[1] = FVector2D(LineX, ScaledMaxY);
 
-		if (const float CurrentThickness = (X == 0 || X == NumColumns) ? ScaledBorderThickness : ScaledGridLineThickness
-			; CurrentThickness > 0)
+		// TÙY CHỈNH MỚI: Chọn độ dày và màu phù hợp
+		const bool bIsBorder = (X == 0 || X == NumColumns);
+		const float CurrentThickness = bIsBorder ? ScaledBorderThickness : ScaledGridLineThickness;
+
+		if (const FLinearColor& CurrentColor = bIsBorder ? BorderLineColor : GridLineColor;
+			CurrentThickness > 0 && CurrentColor.A > 0)
 		{
 			FSlateDrawElement::MakeLines(OutDrawElements, CurrentLayerId, PaintGeometry, LinePoints,
-			                             ESlateDrawEffect::None, GridLineColor, false, CurrentThickness);
+			                             ESlateDrawEffect::None, CurrentColor, false, CurrentThickness);
 		}
 	}
 
@@ -78,11 +82,15 @@ int32 UOBGridBackgroundWidget::NativePaint(const FPaintArgs& Args, const FGeomet
 		LinePoints[0] = FVector2D(0, LineY);
 		LinePoints[1] = FVector2D(ScaledMaxX, LineY);
 
-		if (const float CurrentThickness = (Y == 0 || Y == NumRows) ? ScaledBorderThickness : ScaledGridLineThickness;
-			CurrentThickness > 0)
+		// TÙY CHỈNH MỚI: Chọn độ dày và màu phù hợp
+		const bool bIsBorder = (Y == 0 || Y == NumRows);
+		const float CurrentThickness = bIsBorder ? ScaledBorderThickness : ScaledGridLineThickness;
+
+		if (const FLinearColor& CurrentColor = bIsBorder ? BorderLineColor : GridLineColor;
+			CurrentThickness > 0 && CurrentColor.A > 0)
 		{
 			FSlateDrawElement::MakeLines(OutDrawElements, CurrentLayerId, PaintGeometry, LinePoints,
-			                             ESlateDrawEffect::None, GridLineColor, false, CurrentThickness);
+			                             ESlateDrawEffect::None, CurrentColor, false, CurrentThickness);
 		}
 	}
 
@@ -99,14 +107,10 @@ int32 UOBGridBackgroundWidget::NativePaint(const FPaintArgs& Args, const FGeomet
 		}
 		FString FullText = FString::Printf(TEXT("%s\n%s"), *OwnerName, *SizeInfo);
 		const FSlateFontInfo FontInfo = FCoreStyle::Get().GetFontStyle("SmallFont");
-		constexpr FLinearColor TextColor = FLinearColor(0.4f, 0.4f, 0.4f, 1.0f); // Gray
+		constexpr FLinearColor TextColor = FLinearColor(0.4f, 0.4f, 0.4f, 1.0f);
 
 		const FVector2D Position(5.0f, 5.0f);
-		// // move position to the center of this
 
-		// const FVector2D Position = AllottedGeometry.GetAbsolutePositionAtCoordinates(FVector2f(0.5f, 0.5f));
-
-		// Create a render transform to move to center
 		const FSlateRenderTransform CenteredTransform(Position);
 		FPaintGeometry TextGeometry = PaintGeometry;
 		TextGeometry.SetRenderTransform(Concatenate(PaintGeometry.GetAccumulatedRenderTransform(), CenteredTransform));
