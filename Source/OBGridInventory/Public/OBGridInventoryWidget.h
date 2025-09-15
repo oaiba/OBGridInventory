@@ -68,7 +68,9 @@ struct FOBGridItemInfo
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnOBGridItemAdded, UUserWidget*, ItemWidget, const FOBGridItemInfo&,
 											 ItemInfo);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnOBGridItemRemoved, UUserWidget*, ItemWidget);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnOBGridItemMoved, UUserWidget*, ItemWidget, const FOBGridItemInfo&,
 											 NewItemInfo);
 
@@ -84,8 +86,8 @@ public:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	virtual void NativeOnInitialized() override;
 	virtual FNavigationReply NativeOnNavigation(const FGeometry& MyGeometry,
-	                                            const FNavigationEvent& InNavigationEvent,
-	                                            const FNavigationReply& InDefaultReply) override;
+												const FNavigationEvent& InNavigationEvent,
+												const FNavigationReply& InDefaultReply) override;
 
 public:
 	// --- Grid Configuration ---
@@ -96,7 +98,8 @@ public:
 	virtual void SetGridColumns(const int32 NewGridColumns);
 
 	// --- Item Management ---
-	UFUNCTION(BlueprintCallable, Category = "Grid Inventory|Items", meta=(DisplayName="Add Item Widget (Auto-Placement)"))
+	UFUNCTION(BlueprintCallable, Category = "Grid Inventory|Items",
+		meta=(DisplayName="Add Item Widget (Auto-Placement)"))
 	UUserWidget* AddItemWidget(UObject* ItemDataSource, const FInstancedStruct& ItemPayload, int32 ItemRows = 1,
 							   int32 ItemCols = 1, TSubclassOf<UUserWidget> CustomItemWidgetClass = nullptr);
 
@@ -149,7 +152,7 @@ public:
 protected:
 	// --- Internal ---
 	bool ValidateAddItemInputs(UObject* ItemDataSource, int32 ItemRows, int32 ItemCols,
-	                           TSubclassOf<UUserWidget> CustomItemWidgetClass) const;
+							   TSubclassOf<UUserWidget> CustomItemWidgetClass) const;
 
 	UUserWidget* AddItemWidgetInternal(UObject* ItemDataSource, const FInstancedStruct& ItemPayload, int32 ItemRows,
 									   int32 ItemCols, int32 RowTopLeft, int32 ColTopLeft,
@@ -194,7 +197,7 @@ private:
 	// --- Helpers ---
 	bool FindFreeSlot(int32 ItemRows, int32 ItemCols, int32& OutRow, int32& OutCol) const;
 	bool IsAreaClearForMove(int32 TopLeftRow, int32 TopLeftCol, int32 ItemRows, int32 ItemCols,
-	                        UUserWidget* IgnoredWidget) const;
+							UUserWidget* IgnoredWidget) const;
 	void UpdateGridBackground() const;
 	bool CalculateCurrentScale(const FGeometry& CurrentGeometry);
 	void UpdateSizeBoxOverride() const;
