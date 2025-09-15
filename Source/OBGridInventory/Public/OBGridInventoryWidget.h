@@ -207,3 +207,48 @@ private:
 	void RemoveDummyWidgetAt(const FIntPoint& Coord);
 	void SetupGridPanelDimensions();
 };
+
+
+/*
+ *
+* // Trong một hàm nào đó...
+void AMyPlayerController::GivePlayerSword()
+{
+	// 1. Tạo dữ liệu payload tùy chỉnh
+	FWeaponData SwordData;
+	SwordData.Durability = FMath::RandRange(80.0f, 100.0f);
+	SwordData.BonusDamage = 10;
+
+	// 2. Đóng gói nó vào một FInstancedStruct
+	FInstancedStruct WeaponPayload;
+	WeaponPayload.InitializeAs<FWeaponData>(SwordData);
+	
+	// 3. Lấy Data Asset của item (dữ liệu tĩnh)
+	UMyItemAsset* SwordAsset = LoadObject<UMyItemAsset>(nullptr, TEXT("Path/To/Your/DA_Sword.DA_Sword"));
+
+	// 4. Gọi hàm AddItemWidget với payload
+	if (MyInventoryWidget && SwordAsset)
+	{
+		MyInventoryWidget->AddItemWidget(SwordAsset, WeaponPayload, 3, 1); // Giả sử kiếm chiếm 3x1 ô
+	}
+}
+
+void AMyPlayerController::InspectFirstItem()
+{
+	TArray<UUserWidget*> AllItems;
+	MyInventoryWidget->GetAllItemWidgets(AllItems);
+	if(AllItems.Num() > 0)
+	{
+		FInstancedStruct Payload;
+		if(MyInventoryWidget->GetItemPayload(AllItems[0], Payload))
+		{
+			// Lấy dữ liệu ra
+			const FWeaponData* WeaponData = Payload.GetPtr<FWeaponData>();
+			if(WeaponData)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Item Durability: %f"), WeaponData->Durability);
+			}
+		}
+	}
+}
+ */
