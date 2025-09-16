@@ -84,11 +84,11 @@ void UOBGridInventoryWidget::SetGridColumns(const int32 NewGridColumns)
 
 // --- Item Management ---
 
-UUserWidget* UOBGridInventoryWidget::AddItemWidget(UObject* ItemDataSource, const FInstancedStruct& ItemPayload,
-												   const int32 ItemRows, const int32 ItemCols,
+UUserWidget* UOBGridInventoryWidget::AddItemWidget(const FInstancedStruct& ItemPayload, const int32 ItemRows,
+												   const int32 ItemCols,
 												   const TSubclassOf<UUserWidget> CustomItemWidgetClass)
 {
-	if (!ValidateAddItemInputs(ItemDataSource, ItemRows, ItemCols, CustomItemWidgetClass))
+	if (!ValidateAddItemInputs(ItemRows, ItemCols, CustomItemWidgetClass))
 	{
 		return nullptr;
 	}
@@ -102,16 +102,16 @@ UUserWidget* UOBGridInventoryWidget::AddItemWidget(UObject* ItemDataSource, cons
 		return nullptr;
 	}
 
-	return AddItemWidgetInternal(ItemDataSource, ItemPayload, ItemRows, ItemCols, FoundRow, FoundCol,
+	return AddItemWidgetInternal(ItemPayload, ItemRows, ItemCols, FoundRow, FoundCol,
 								 CustomItemWidgetClass);
 }
 
-UUserWidget* UOBGridInventoryWidget::AddItemWidgetAt(UObject* ItemDataSource, const FInstancedStruct& ItemPayload,
-													 const int32 ItemRows, const int32 ItemCols,
+UUserWidget* UOBGridInventoryWidget::AddItemWidgetAt(const FInstancedStruct& ItemPayload, const int32 ItemRows,
+													 const int32 ItemCols,
 													 const int32 RowTopLeft, const int32 ColTopLeft,
 													 const TSubclassOf<UUserWidget> CustomItemWidgetClass)
 {
-	if (!ValidateAddItemInputs(ItemDataSource, ItemRows, ItemCols, CustomItemWidgetClass))
+	if (!ValidateAddItemInputs(ItemRows, ItemCols, CustomItemWidgetClass))
 	{
 		return nullptr;
 	}
@@ -124,7 +124,7 @@ UUserWidget* UOBGridInventoryWidget::AddItemWidgetAt(UObject* ItemDataSource, co
 		return nullptr;
 	}
 
-	return AddItemWidgetInternal(ItemDataSource, ItemPayload, ItemRows, ItemCols, RowTopLeft, ColTopLeft,
+	return AddItemWidgetInternal(ItemPayload, ItemRows, ItemCols, RowTopLeft, ColTopLeft,
 								 CustomItemWidgetClass);
 }
 
@@ -214,19 +214,6 @@ void UOBGridInventoryWidget::GetAllItemWidgets(TArray<UUserWidget*>& OutItemWidg
 	}
 }
 
-UUserWidget* UOBGridInventoryWidget::GetItemWidgetFromDataSource(UObject* DataSource) const
-{
-	if (!DataSource) return nullptr;
-	for (const TPair<TObjectPtr<UUserWidget>, FOBGridItemInfo>& Pair : PlacedItemInfoMap)
-	{
-		if (Pair.Value.ItemDataSource == DataSource)
-		{
-			return Pair.Key;
-		}
-	}
-	return nullptr;
-}
-
 bool UOBGridInventoryWidget::GetItemInfo(UUserWidget* ItemWidget, FOBGridItemInfo& OutItemInfo) const
 {
 	if (!ItemWidget) return false;
@@ -238,20 +225,17 @@ bool UOBGridInventoryWidget::GetItemInfo(UUserWidget* ItemWidget, FOBGridItemInf
 	return false;
 }
 
-bool UOBGridInventoryWidget::GetItemAt(const int32 TopLeftRow, const int32 TopLeftCol, UUserWidget*& OutItemWidget,
-									   UObject*& OutItemDataSource, FInstancedStruct& OutItemPayload) const
+bool UOBGridInventoryWidget::GetItemAt(const int32 TopLeftRow, const int32 TopLeftCol,
+									   UUserWidget*& OutItemWidget, FInstancedStruct& OutItemPayload) const
 {
 	OutItemWidget = nullptr;
-	OutItemDataSource = nullptr;
 	OutItemPayload.Reset();
 
 	for (const TPair<TObjectPtr<UUserWidget>, FOBGridItemInfo>& Pair : PlacedItemInfoMap)
 	{
-		const FOBGridItemInfo& Info = Pair.Value;
-		if (Info.Row == TopLeftRow && Info.Column == TopLeftCol)
+		if (const FOBGridItemInfo& Info = Pair.Value; Info.Row == TopLeftRow && Info.Column == TopLeftCol)
 		{
 			OutItemWidget = Pair.Key;
-			OutItemDataSource = Info.ItemDataSource;
 			OutItemPayload = Info.ItemPayload;
 			return true;
 		}
@@ -275,8 +259,7 @@ bool UOBGridInventoryWidget::GetItemPayload(UUserWidget* ItemWidget, FInstancedS
 
 // --- Internal Implementation ---
 
-bool UOBGridInventoryWidget::ValidateAddItemInputs(UObject* ItemDataSource, const int32 ItemRows,
-												   const int32 ItemCols,
+bool UOBGridInventoryWidget::ValidateAddItemInputs(const int32 ItemRows, const int32 ItemCols,
 												   const TSubclassOf<UUserWidget> CustomItemWidgetClass) const
 {
 	if (!ItemGridPanel)
@@ -301,8 +284,7 @@ bool UOBGridInventoryWidget::ValidateAddItemInputs(UObject* ItemDataSource, cons
 	return true;
 }
 
-UUserWidget* UOBGridInventoryWidget::AddItemWidgetInternal(UObject* ItemDataSource,
-														   const FInstancedStruct& ItemPayload, const int32 ItemRows,
+UUserWidget* UOBGridInventoryWidget::AddItemWidgetInternal(const FInstancedStruct& ItemPayload, const int32 ItemRows,
 														   const int32 ItemCols, const int32 RowTopLeft,
 														   const int32 ColTopLeft,
 														   const TSubclassOf<UUserWidget> CustomItemWidgetClass)
@@ -321,7 +303,7 @@ UUserWidget* UOBGridInventoryWidget::AddItemWidgetInternal(UObject* ItemDataSour
 		GridSlot->SetHorizontalAlignment(HAlign_Fill);
 		GridSlot->SetVerticalAlignment(VAlign_Fill);
 
-		const FOBGridItemInfo NewItemInfo(RowTopLeft, ColTopLeft, ItemRows, ItemCols, ItemDataSource, ItemPayload);
+		const FOBGridItemInfo NewItemInfo(RowTopLeft, ColTopLeft, ItemRows, ItemCols, ItemPayload);
 		PlacedItemInfoMap.Add(NewItemWidget, NewItemInfo);
 
 		UE_LOG(LogTemp, Log, TEXT("[%s::%hs] - Added '%s' at (Row:%d, Col:%d), Span(Rows:%d, Cols:%d)"),

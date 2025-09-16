@@ -38,10 +38,6 @@ struct FOBGridItemInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="OB|Grid Item")
 	int32 ColumnSpan = 1;
 
-	/** The static data source object (e.g., a UDataAsset) associated with this item instance. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="OB|Grid Item", Transient)
-	TObjectPtr<UObject> ItemDataSource = nullptr;
-
 	/** A flexible payload for any custom, dynamic data (e.g., durability, stats). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="OB|Grid Item")
 	FInstancedStruct ItemPayload;
@@ -53,9 +49,8 @@ struct FOBGridItemInfo
 	FOBGridItemInfo() = default;
 
 	FOBGridItemInfo(const int32 InRow, const int32 InCol, const int32 InRowSpan, const int32 InColSpan,
-					UObject* InDataSource, const FInstancedStruct& InPayload)
-		: Row(InRow), Column(InCol), RowSpan(InRowSpan), ColumnSpan(InColSpan), ItemDataSource(InDataSource),
-		  ItemPayload(InPayload)
+					const FInstancedStruct& InPayload)
+		: Row(InRow), Column(InCol), RowSpan(InRowSpan), ColumnSpan(InColSpan), ItemPayload(InPayload)
 	{
 	}
 
@@ -100,12 +95,12 @@ public:
 	// --- Item Management ---
 	UFUNCTION(BlueprintCallable, Category = "Grid Inventory|Items",
 		meta=(DisplayName="Add Item Widget (Auto-Placement)"))
-	UUserWidget* AddItemWidget(UObject* ItemDataSource, const FInstancedStruct& ItemPayload, int32 ItemRows = 1,
-							   int32 ItemCols = 1, TSubclassOf<UUserWidget> CustomItemWidgetClass = nullptr);
+	UUserWidget* AddItemWidget(const FInstancedStruct& ItemPayload = FInstancedStruct(), const int32 ItemRows = 1,
+							   const int32 ItemCols = 1, TSubclassOf<UUserWidget> CustomItemWidgetClass = nullptr);
 
 	UFUNCTION(BlueprintCallable, Category = "Grid Inventory|Items", meta=(DisplayName="Add Item Widget at Slot"))
-	UUserWidget* AddItemWidgetAt(UObject* ItemDataSource, const FInstancedStruct& ItemPayload, int32 ItemRows,
-								 int32 ItemCols, int32 RowTopLeft, int32 ColTopLeft,
+	UUserWidget* AddItemWidgetAt(const FInstancedStruct& ItemPayload = FInstancedStruct(), int32 ItemRows = 1,
+								 const int32 ItemCols = 1, const int32 RowTopLeft, const int32 ColTopLeft,
 								 TSubclassOf<UUserWidget> CustomItemWidgetClass = nullptr);
 
 	UFUNCTION(BlueprintCallable, Category = "Grid Inventory|Items")
@@ -125,13 +120,10 @@ public:
 	void GetAllItemWidgets(TArray<UUserWidget*>& OutItemWidgets) const;
 
 	UFUNCTION(BlueprintPure, Category = "Grid Inventory|Querying")
-	UUserWidget* GetItemWidgetFromDataSource(UObject* DataSource) const;
-
-	UFUNCTION(BlueprintPure, Category = "Grid Inventory|Querying")
 	bool GetItemInfo(UUserWidget* ItemWidget, FOBGridItemInfo& OutItemInfo) const;
 
 	UFUNCTION(BlueprintPure, Category = "Grid Inventory|Querying")
-	bool GetItemAt(int32 TopLeftRow, int32 TopLeftCol, UUserWidget*& OutItemWidget, UObject*& OutItemDataSource,
+	bool GetItemAt(int32 TopLeftRow, int32 TopLeftCol, UUserWidget*& OutItemWidget,
 				   FInstancedStruct& OutItemPayload) const;
 
 	/** NEW: Gets the custom data payload for a specific item widget. */
@@ -151,10 +143,9 @@ public:
 
 protected:
 	// --- Internal ---
-	bool ValidateAddItemInputs(UObject* ItemDataSource, int32 ItemRows, int32 ItemCols,
-							   TSubclassOf<UUserWidget> CustomItemWidgetClass) const;
+	bool ValidateAddItemInputs(int32 ItemRows, int32 ItemCols, TSubclassOf<UUserWidget> CustomItemWidgetClass) const;
 
-	UUserWidget* AddItemWidgetInternal(UObject* ItemDataSource, const FInstancedStruct& ItemPayload, int32 ItemRows,
+	UUserWidget* AddItemWidgetInternal(const FInstancedStruct& ItemPayload, int32 ItemRows,
 									   int32 ItemCols, int32 RowTopLeft, int32 ColTopLeft,
 									   TSubclassOf<UUserWidget> CustomItemWidgetClass);
 
