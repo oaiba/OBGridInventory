@@ -100,7 +100,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Grid Inventory|Items", meta=(DisplayName="Add Item Widget at Slot"))
 	UUserWidget* AddItemWidgetAt(const FInstancedStruct& ItemPayload = FInstancedStruct(), int32 ItemRows = 1,
-								 const int32 ItemCols = 1, const int32 RowTopLeft, const int32 ColTopLeft,
+								 const int32 ItemCols = 1, const int32 RowTopLeft = 1, const int32 ColTopLeft = 1,
 								 TSubclassOf<UUserWidget> CustomItemWidgetClass = nullptr);
 
 	UFUNCTION(BlueprintCallable, Category = "Grid Inventory|Items")
@@ -145,8 +145,8 @@ protected:
 	// --- Internal ---
 	bool ValidateAddItemInputs(int32 ItemRows, int32 ItemCols, TSubclassOf<UUserWidget> CustomItemWidgetClass) const;
 
-	UUserWidget* AddItemWidgetInternal(const FInstancedStruct& ItemPayload, int32 ItemRows,
-									   int32 ItemCols, int32 RowTopLeft, int32 ColTopLeft,
+	UUserWidget* AddItemWidgetInternal(const FInstancedStruct& ItemPayload, const int32 ItemRows,
+									   const int32 ItemCols, const int32 RowTopLeft, const int32 ColTopLeft,
 									   TSubclassOf<UUserWidget> CustomItemWidgetClass);
 
 protected:
