@@ -1,6 +1,8 @@
 // Copyright (c) 2024. All rights reserved.
 
 #include "OBGridInventoryWidget.h"
+
+#include "OBGridItemWidgetInterface.h"
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
 
@@ -306,6 +308,21 @@ UUserWidget* UOBGridInventoryWidget::AddItemWidgetInternal(const FInstancedStruc
 		const FOBGridItemInfo NewItemInfo(RowTopLeft, ColTopLeft, ItemRows, ItemCols, ItemPayload);
 		PlacedItemInfoMap.Add(NewItemWidget, NewItemInfo);
 
+		// Check if the newly created widget implements our interface.
+		if (NewItemWidget->Implements<UOBGridItemWidgetInterface>())
+		{
+			// Call the interface function to pass the data to the widget.
+			IOBGridItemWidgetInterface::Execute_OnItemInitialized(NewItemWidget, NewItemInfo);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning,
+				   TEXT(
+					   "[%s::%hs] - Widget '%s' of class '%s' was added to the grid but does not implement IOBGridItemWidgetInterface. It will not receive its item data."
+				   ),
+				   *GetNameSafe(this), __FUNCTION__, *GetNameSafe(NewItemWidget), *GetNameSafe(WidgetClassToCreate));
+		}
+
 		UE_LOG(LogTemp, Log, TEXT("[%s::%hs] - Added '%s' at (Row:%d, Col:%d), Span(Rows:%d, Cols:%d)"),
 			   *GetNameSafe(this), __FUNCTION__, *NewItemWidget->GetName(), RowTopLeft, ColTopLeft, ItemRows, ItemCols);
 
@@ -320,8 +337,8 @@ UUserWidget* UOBGridInventoryWidget::AddItemWidgetInternal(const FInstancedStruc
 
 // --- Helpers ---
 
-bool UOBGridInventoryWidget::FindFreeSlot(const int32 ItemRows, const int32 ItemCols, int32& OutRow,
-										  int32& OutCol) const
+bool UOBGridInventoryWidget::FindFreeSlot(const int32 ItemRows, const int32 ItemCols,
+										  int32& OutRow, int32& OutCol) const
 {
 	if (GridConfig.NumRows < ItemRows || GridConfig.NumColumns < ItemCols) return false;
 
